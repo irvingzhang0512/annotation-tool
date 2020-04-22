@@ -7,6 +7,7 @@ IMAGE_SIZE = (512, 512)  # 展示的图像大小
 DEFAULT_TIMEOUT = 50  # 展示视频时的timeout
 IMG_TYPES = (".png", ".jpg", "jpeg", ".tiff", ".bmp")  # 支持的图像类型
 VIDEO_TYPES = (".mp4", ".avi")  # 支持的视频类型
+LISTBOX_FILTER_FILE_PATH = "/ssd4/zhangyiyang/temporal-shift-module/data/filter.txt"
 
 # GUI 相关内容
 image_elem = sg.Image(data=None, size=IMAGE_SIZE)
@@ -16,7 +17,7 @@ file_listbox = sg.Listbox(values=[], change_submits=True,
                           size=(50, 50), key='listbox')
 layout = [
     [
-        sg.InputText('/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/video', size=(80, 1),
+        sg.InputText('/ssd4/zhangyiyang/data/jester-v1/20bn-jester-v1', size=(80, 1),
                      change_submits=True, key="dir"),
         sg.FolderBrowse(),
         sg.Radio('Image', "Radio",
@@ -46,6 +47,7 @@ window = sg.Window('Image/Video Viewer', layout,
                    grab_anywhere=False,
                    return_keyboard_events=True,
                    location=(0, 0), )
+print("window created.")
 
 # 整体框架的timeout
 # 当timeout为None时，表示展示图像或展示视频结束，图像保持不变
@@ -90,6 +92,12 @@ def _update_listbox(values):
         if_fn = _is_dir
     flist = os.listdir(cur_path)
     fnames = [f for f in flist if if_fn(os.path.join(cur_path, f))]
+    if os.path.exists(LISTBOX_FILTER_FILE_PATH):
+        with open(LISTBOX_FILTER_FILE_PATH, 'r') as f:
+            file_names = f.readlines()
+        file_names = [l.strip() for l in file_names]
+        if len(file_names) > 0:
+            fnames = [f for f in fnames if f in file_names]
     fnames.sort()
     if len(fnames) == 0:
         cur_listbox_id = None
@@ -242,7 +250,7 @@ def _update_file_num_text(values):
 
 while True:
     event, values = window.read(timeout=timeout)
-    print(event, values)
+    # print(event, values)
 
     if event == 'Exit' or event is None:
         # 关闭窗口
@@ -256,6 +264,8 @@ while True:
         _update_showing_params(values)
     elif str(event).startswith("radio"):
         # 改变展示数据类型
+        if not os.path.isdir(values['dir']):
+            continue
         _update_listbox(values)
         _update_file_num_text(values)
         _update_showing_params(values)
