@@ -11,25 +11,25 @@ def _parse_args():
 
     parser.add_argument("--start-id", type=int, default=1)
     parser.add_argument("--category-file-path", type=str,
-                        default="/ssd4/zhangyiyang/data/jester-v1/category.txt")
+                        default="/ssd4/zhangyiyang/data/AR/category.txt")
 
     # from
     parser.add_argument("--from-label-dir-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/from_label")
+                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/from_label/waiting")
     parser.add_argument("--from-frame-dir-path", type=str,
                         default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/video")
-    parser.add_argument("--from-img-prefix", type=str, default="{:06d}.jpg")
+    parser.add_argument("--from-img-prefix", type=str, default="{:05d}.jpg")
     parser.add_argument("--from-time-interval", type=float, default=.1)
 
     # to
     parser.add_argument("--to-frame-dir-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/to_videos")
-    parser.add_argument("--to-img-prefix", type=str, default="{:06d}.jpg")
+                        default="/ssd4/zhangyiyang/data/AR/to_frames")
+    parser.add_argument("--to-img-prefix", type=str, default="{:05d}.jpg")
     parser.add_argument("--to-time-interval", type=float, default=.1)
 
     # output file
     parser.add_argument("--output-file-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/to_label/output.txt")
+                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/to_label/output.txt")
     parser.add_argument("--output-file-append", action="store_true")
 
     return parser.parse_args()
@@ -83,8 +83,10 @@ def _handle_one_file(file_name, to_file, category_to_id, args):
 
         # 复制图片，并重新编号
         for to_idx, from_idx in enumerate(from_ids):
-            from_img = os.path.join(from_frame_path,
-                                    str(args.from_img_prefix).format(from_idx))
+            # 得到的编号是从0开始的，但视频提取帧的图片编号是从1开始的
+            from_img = os.path.join(
+                from_frame_path,
+                str(args.from_img_prefix).format(from_idx+1))
             to_img = os.path.join(
                 to_frame_path, str(args.to_img_prefix).format(to_idx))
             if os.path.exists(from_img):
