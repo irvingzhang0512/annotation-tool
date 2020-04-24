@@ -9,28 +9,28 @@ to_id = 0
 def _parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--start-id", type=int, default=1)
     parser.add_argument("--category-file-path", type=str,
                         default="/ssd4/zhangyiyang/data/AR/category.txt")
 
-    # from
-    parser.add_argument("--from-label-dir-path", type=str,
+    # from labels & from frames
+    parser.add_argument("--from-labels-file-dir", type=str,
                         default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/from_label/waiting")
-    parser.add_argument("--from-frame-dir-path", type=str,
+    parser.add_argument("--from-frames-dir", type=str,
                         default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/video")
     parser.add_argument("--from-img-prefix", type=str, default="{:05d}.jpg")
     parser.add_argument("--from-time-interval", type=float, default=.1)
 
-    # to
-    parser.add_argument("--to-frame-dir-path", type=str,
+    # to frames
+    parser.add_argument("--to-frames-dir", type=str,
                         default="/ssd4/zhangyiyang/data/AR/to_frames")
     parser.add_argument("--to-img-prefix", type=str, default="{:05d}.jpg")
     parser.add_argument("--to-time-interval", type=float, default=.1)
+    parser.add_argument("--start-id", type=int, default=1)
 
-    # output file
-    parser.add_argument("--output-file-path", type=str,
+    # to labels
+    parser.add_argument("--to-labels-file-path", type=str,
                         default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/to_label/output.txt")
-    parser.add_argument("--output-file-append", action="store_true")
+    parser.add_argument("--to-labels-file-append", action="store_true")
 
     return parser.parse_args()
 
@@ -73,8 +73,8 @@ def _handle_one_file(file_name, to_file, category_to_id, args):
                     if (t1 + i * to_time_interval) * inner_interval <= t2]
 
         # 准备复制文件
-        from_frame_path = os.path.join(args.from_frame_dir_path, from_id)
-        to_frame_path = os.path.join(args.to_frame_dir_path, str(to_id))
+        from_frame_path = os.path.join(args.from_frames_dir, from_id)
+        to_frame_path = os.path.join(args.to_frames_dir, str(to_id))
         to_id += 1
         if not os.path.exists(from_frame_path):
             print("from frame path {} doesn't exist".format(from_frame_path))
@@ -109,15 +109,15 @@ def main(args):
     to_id = args.start_id
 
     # 1. 读取输入标记结果路径
-    file_names = os.listdir(args.from_label_dir_path)
-    file_names = [os.path.join(args.from_label_dir_path, f)
+    file_names = os.listdir(args.from_labels_file_dir)
+    file_names = [os.path.join(args.from_labels_file_dir, f)
                   for f in file_names]
 
     # 2. 构建输出结果文件
-    if args.output_file_append:
-        to_file = open(args.output_file_path, "a")
+    if args.to_labels_file_append:
+        to_file = open(args.to_labels_file_path, "a")
     else:
-        to_file = open(args.output_file_path, "w")
+        to_file = open(args.to_labels_file_path, "w")
 
     # 3. 获取样本标签字典
     with open(args.category_file_path, "r") as f:

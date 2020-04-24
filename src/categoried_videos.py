@@ -7,25 +7,26 @@ import logging
 def _parse_args():
     parser = argparse.ArgumentParser()
 
+    parser.add_argument("--ffmpeg", action="store_true", default=False)
     parser.add_argument("--fps", type=int, default=10)
-    parser.add_argument("--img-prefix", type=str, default="{:06d}.jpg")
     parser.add_argument("--tmp-video", type=str, default="./test.avi")
 
     # input video path
     parser.add_argument("--category-file-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/category.txt")
-    parser.add_argument("--video-base-path", type=str,
-                        default="/ssd5/zhangyiyang/data/AR")
+                        default="/ssd4/zhangyiyang/data/AR/category.txt")
+    parser.add_argument("--src-videos-dir", type=str,
+                        default="/ssd4/zhangyiyang/data/AR/videos")
 
-    # output frame path
+    # to_frames_dir
+    parser.add_argument("--to-frames-dir", type=str,
+                        default="/ssd4/zhangyiyang/data/AR/frames")
     parser.add_argument("--start-id", type=int, default=1)
-    parser.add_argument("--frame-output-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/video")
+    parser.add_argument("--img-prefix", type=str, default="{:05d}.jpg")
 
-    # output file
-    parser.add_argument("--output-file-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/to_label.txt")
-    parser.add_argument("--output-file-append", action="store_true")
+    # to_labels.txt
+    parser.add_argument("--to-labels-file-path", type=str,
+                        default="/ssd4/zhangyiyang/data/AR/total_samples.txt")
+    parser.add_argument("--to-labels-file-append", action="store_true")
 
     return parser.parse_args()
 
@@ -37,14 +38,41 @@ def _convert_fps(source_fps, target_fps):
     return [i*interval for i in range(int(source_fps/interval))]
 
 
-def _handle_single_video(video_path, cur_idx, to_file, category_id, args):
+def _handle_single_video(
+        video_path,  # 输入视频绝对路径
+        cur_idx,  # 当前视频对应编号
+        to_label_file,  # TSM标签文件 writer，用于构建 to_label.txt
+        category_id,  # 当前视频代表的行为类别编号
+        args):
     logging.info("start handling {}".format(video_path))
     if not os.path.exists(video_path):
         logging.warn("{} doesn't exist.".format(video_path))
         return
 
-    # 读取视频
+    # 构建输出帧的路径
+    cur_frames_dir = os.path.join(args.to_frames_dir, str(cur_idx))
+    if not os.path.exists(cur_frames_dir):
+        os.mkdir(cur_frames_dir)
+
+    # ffmpeg 提取帧
+    if args.use_ffmpeg:
+        # {:06d}.jpg -> %06d.jpg
+        fmt = args.img_prefix.replace("{", "") \
+            .replace("}", "").replace(":", "%")
+        cmd = 'ffmpeg -i "{}" -threads 1 -vf scale=-1:256 -q:v 0 "{}/{}"'\
+            .format(video_path, cur_frames_dir, fmt)
+        os.system(cmd)
+        to_label_file.write(cur_frames_dir +
+                            " " + str(len(os.listdir(cur_frames_dir))) +
+                            " " + str(category_id) + "\n")
+        return
+
+    # opencv 提取帧
+
+    # 转换输入视频格式
     cmd = "ffmpeg -i {} -q:v 6 {}".format(video_path, args.tmp_video)
+    if os.path.exists(args.tmp_video):
+        os.remove(args.tmp_video)
     os.system(cmd)
     cap = cv2.VideoCapture(args.tmp_video)
     source_fps = int(cap.get(cv2.CAP_PROP_FPS))
@@ -55,11 +83,6 @@ def _handle_single_video(video_path, cur_idx, to_file, category_id, args):
     # 所以，需要在视频的fps中选择我们需要的若干帧图像
     # 下面这个函数就是选择的帧的编号
     ids = _convert_fps(source_fps, args.fps)
-
-    # 构建输出帧的路径
-    output_path = os.path.join(args.frame_output_path, str(cur_idx))
-    if not os.path.exists(output_path):
-        os.mkdir(output_path)
 
     # 分别读取每一帧，然后分别处理
     id = -1
@@ -78,9 +101,9 @@ def _handle_single_video(video_path, cur_idx, to_file, category_id, args):
             # 如果当前帧需要保存，则要保存到目标文件夹中
             file_name_id += 1
             img_name = args.img_prefix.format(file_name_id)
-            cv2.imwrite(os.path.join(output_path, img_name), frame)
-    to_file.write(output_path + " " + str(file_name_id) +
-                  " " + str(category_id) + "\n")
+            cv2.imwrite(os.path.join(cur_frames_dir, img_name), frame)
+    to_label_file.write(cur_frames_dir + " " + str(file_name_id) +
+                        " " + str(category_id) + "\n")
     cap.release()
     if os.path.exists(args.tmp_video):
         os.remove(args.tmp_video)
@@ -88,10 +111,10 @@ def _handle_single_video(video_path, cur_idx, to_file, category_id, args):
 
 def main(args):
     # 初始化TSM格式的标签文件
-    if args.output_file_append:
-        to_file = open(args.output_file_path, "a")
+    if args.to_labels_file_append:
+        to_file = open(args.to_labels_file_path, "a")
     else:
-        to_file = open(args.output_file_path, "w")
+        to_file = open(args.to_labels_file_path, "w")
 
     with open(args.category_file_path, "r") as f:
         categories = f.readlines()
@@ -99,9 +122,9 @@ def main(args):
     category_to_id = {c: idx for idx, c in enumerate(categories)}
 
     tp_idx = 0
-    for category in os.listdir(args.video_base_path):
+    for category in os.listdir(args.src_videos_dir):
         # 依次遍历每类视频
-        video_dir_path = os.path.join(args.video_base_path, category)
+        video_dir_path = os.path.join(args.src_videos_dir, category)
         videos = os.listdir(video_dir_path)
         videos = [os.path.join(video_dir_path, v) for v in videos]
 
