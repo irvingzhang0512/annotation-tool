@@ -22,10 +22,10 @@ def _parse_args():
 
     # to frames
     parser.add_argument("--to-frames-dir", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/to_frames")
+                        default="/ssd4/zhangyiyang/data/AR/raw_to_frames")
     parser.add_argument("--to-img-prefix", type=str, default="{:05d}.jpg")
     parser.add_argument("--to-time-interval", type=float, default=.1)
-    parser.add_argument("--start-id", type=int, default=1)
+    parser.add_argument("--start-id", type=int, default=946)
 
     # to labels
     parser.add_argument("--to-labels-file-path", type=str,
@@ -88,7 +88,7 @@ def _handle_one_file(file_name, to_file, category_to_id, args):
                 from_frame_path,
                 str(args.from_img_prefix).format(from_idx+1))
             to_img = os.path.join(
-                to_frame_path, str(args.to_img_prefix).format(to_idx))
+                to_frame_path, str(args.to_img_prefix).format(to_idx+1))
             if os.path.exists(from_img):
                 shutil.copyfile(from_img, to_img)
             else:
