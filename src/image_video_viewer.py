@@ -7,7 +7,7 @@ IMAGE_SIZE = (512, 512)  # 展示的图像大小
 DEFAULT_TIMEOUT = 50  # 展示视频时的timeout
 IMG_TYPES = (".png", ".jpg", "jpeg", ".tiff", ".bmp")  # 支持的图像类型
 VIDEO_TYPES = (".mp4", ".avi")  # 支持的视频类型
-LISTBOX_FILTER_FILE_PATH = "/ssd4/zhangyiyang/temporal-shift-module/data/filter.txt"
+LISTBOX_FILTER_FILE_PATH = "/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/filter.txt"
 
 # GUI 相关内容
 image_elem = sg.Image(data=None, size=IMAGE_SIZE)
@@ -17,7 +17,7 @@ file_listbox = sg.Listbox(values=[], change_submits=True,
                           size=(50, 50), key='listbox')
 layout = [
     [
-        sg.InputText('/ssd4/zhangyiyang/data/jester-v1/20bn-jester-v1', size=(80, 1),
+        sg.InputText('/ssd4/zhangyiyang/data/AR/generate_videos/results', size=(80, 1),
                      change_submits=True, key="dir"),
         sg.FolderBrowse(),
         sg.Radio('Image', "Radio",
@@ -121,6 +121,8 @@ def _update_image(values):
         _do_update_image_frame(frame)
 
     def _update_image_radio_video1(values):
+        if radio_video1_cap is None:
+            return
         global radio_video1_idx
         flag, frame = radio_video1_cap.read()
         radio_video1_idx += 1
