@@ -19,9 +19,9 @@ def _parse_args():
 
     parser.add_argument("--to-flip-frames-dir", type=str,
                         default="/ssd4/zhangyiyang/data/AR/flip_frames")
-    parser.add_argument("--start-id", type=int, default=114860)
+    parser.add_argument("--start-id", type=int, default=115048)
     parser.add_argument("--pre-to-labels-file-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/to_label/output.txt")
+                        default="/ssd4/zhangyiyang/data/AR/label/append-generate-5-9.txt")
     parser.add_argument("--after-to-labels-file-path", type=str,
                         default="/ssd4/zhangyiyang/data/AR/label/flip_total.txt")
     parser.add_argument("--after-to-labels-file-append", action="store_true",

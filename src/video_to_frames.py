@@ -9,7 +9,7 @@ def _parse_args():
 
     # input
     parser.add_argument("--src-videos-dir", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/videos/mine/something")
+                        default="/ssd4/zhangyiyang/data/AR/videos/mine/something/waiting")
     parser.add_argument("--tmp-video", type=str, default="./test.avi",
                         help="useless if --ffmpeg")
     parser.add_argument("--ffmpeg", action="store_true")
@@ -18,14 +18,14 @@ def _parse_args():
 
     # web videos/frames file
     parser.add_argument("--web-videos-file-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/ar_4_video.txt")
+                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/4-26_video.txt")
     parser.add_argument("--web-videos-file-append", action="store_true")
     parser.add_argument("--web-frames-file-path", type=str,
-                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/ar_4_frame.txt")
+                        default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/ar/4-26_frame.txt")
     parser.add_argument("--web-frames-file-append", action="store_true")
 
     # from_frames_dir
-    parser.add_argument("--start-id", type=int, default=320)
+    parser.add_argument("--start-id", type=int, default=323)
     parser.add_argument("--img-prefix", type=str, default="{:05d}.jpg")
     parser.add_argument("--from-frames-dir", type=str,
                         default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/video")

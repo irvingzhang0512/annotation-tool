@@ -14,7 +14,7 @@ def _parse_args():
     parser.add_argument("--to-labels-file-path", type=str,
                         default="/ssd4/zhangyiyang/data/AR/label/flip_total.txt")
     parser.add_argument("--val-percent-per-category", type=float, default=0.1)
-    parser.add_argument("--max-val-per-category", type=int, default=50)
+    parser.add_argument("--max-val-per-category", type=int, default=200)
 
     parser.add_argument("--train-file-path", type=str,
                         default="/ssd4/zhangyiyang/data/AR/label/train_samples.txt")

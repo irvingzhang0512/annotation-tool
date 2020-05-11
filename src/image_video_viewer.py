@@ -17,7 +17,7 @@ file_listbox = sg.Listbox(values=[], change_submits=True,
                           size=(50, 50), key='listbox')
 layout = [
     [
-        sg.InputText('/ssd4/zhangyiyang/data/AR/generate_videos/results', size=(80, 1),
+        sg.InputText('/ssd4/zhangyiyang/data/something-something-v2/20bn-something-something-v2-frames', size=(80, 1),
                      change_submits=True, key="dir"),
         sg.FolderBrowse(),
         sg.Radio('Image', "Radio",
@@ -42,12 +42,6 @@ layout = [
         ])
     ]
 ]
-window = sg.Window('Image/Video Viewer', layout,
-                   default_element_size=(40, 1),
-                   grab_anywhere=False,
-                   return_keyboard_events=True,
-                   location=(0, 0), )
-print("window created.")
 
 # 整体框架的timeout
 # 当timeout为None时，表示展示图像或展示视频结束，图像保持不变
@@ -250,54 +244,60 @@ def _update_file_num_text(values):
                            len(fnames)))
 
 
-while True:
-    event, values = window.read(timeout=timeout)
-    # print(event, values)
+if __name__ == '__main__':
+    window = sg.Window('Image/Video Viewer', layout,
+                       default_element_size=(40, 1),
+                       grab_anywhere=False,
+                       return_keyboard_events=True,
+                       location=(0, 0), )
+    print("window created.")
 
-    if event == 'Exit' or event is None:
-        # 关闭窗口
-        break
-    elif event == 'dir':
-        # 改变路径
-        if not os.path.isdir(values['dir']):
-            continue
-        _update_listbox(values)
-        _update_file_num_text(values)
-        _update_showing_params(values)
-    elif str(event).startswith("radio"):
-        # 改变展示数据类型
-        if not os.path.isdir(values['dir']):
-            continue
-        _update_listbox(values)
-        _update_file_num_text(values)
-        _update_showing_params(values)
-    elif event == 'listbox':
-        # 选择listbox中的文件
+    while True:
+        event, values = window.read(timeout=timeout)
+        # print(event, values)
 
-        if len(file_listbox.get()) != 0:
-            # 如果已经选择了文件，则更新listbox_id
-            cur_listbox_id = fnames.index(file_listbox.get()[0])
-        _update_file_num_text(values)
-        _update_showing_params(values)
-    elif event in ['Next', 'Down:104']:
-        # 键盘右/下，改变listbox中的选中文件
-        file_listbox.set_focus()
-        if cur_listbox_id < len(fnames) - 1:
-            cur_listbox_id += 1
-            file_listbox.Update(set_to_index=cur_listbox_id)
+        if event == 'Exit' or event is None:
+            # 关闭窗口
+            break
+        elif event == 'dir':
+            # 改变路径
+            if not os.path.isdir(values['dir']):
+                continue
+            _update_listbox(values)
             _update_file_num_text(values)
-        _update_showing_params(values)
-    elif event in ['Prev', 'Up:98']:
-        # 键盘左/上，改变listbox中的选中文件
-        file_listbox.set_focus()
-        if cur_listbox_id > 0:
-            cur_listbox_id -= 1
-            file_listbox.Update(set_to_index=cur_listbox_id)
+            _update_showing_params(values)
+        elif str(event).startswith("radio"):
+            # 改变展示数据类型
+            if not os.path.isdir(values['dir']):
+                continue
+            _update_listbox(values)
             _update_file_num_text(values)
-        _update_showing_params(values)
+            _update_showing_params(values)
+        elif event == 'listbox':
+            # 选择listbox中的文件
 
-    # 展示图像
-    _update_image(values)
+            if len(file_listbox.get()) != 0:
+                # 如果已经选择了文件，则更新listbox_id
+                cur_listbox_id = fnames.index(file_listbox.get()[0])
+            _update_file_num_text(values)
+            _update_showing_params(values)
+        elif event in ['Next', 'Down:104']:
+            # 键盘右/下，改变listbox中的选中文件
+            file_listbox.set_focus()
+            if cur_listbox_id < len(fnames) - 1:
+                cur_listbox_id += 1
+                file_listbox.Update(set_to_index=cur_listbox_id)
+                _update_file_num_text(values)
+            _update_showing_params(values)
+        elif event in ['Prev', 'Up:98']:
+            # 键盘左/上，改变listbox中的选中文件
+            file_listbox.set_focus()
+            if cur_listbox_id > 0:
+                cur_listbox_id -= 1
+                file_listbox.Update(set_to_index=cur_listbox_id)
+                _update_file_num_text(values)
+            _update_showing_params(values)
 
-
-window.close()
+        # 展示图像
+        _update_image(values)
+    window.close()

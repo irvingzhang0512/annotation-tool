@@ -9,23 +9,23 @@ def _parse_args():
 
     parser.add_argument("--ffmpeg", action="store_true", default=False)
     parser.add_argument("--fps", type=int, default=10)
-    parser.add_argument("--tmp-video", type=str, default="./test.avi")
+    parser.add_argument("--tmp-video", type=str, default="./test-categoried.avi")
 
     # input video path
     parser.add_argument("--category-file-path", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/category.txt")
+                        default="/ssd4/zhangyiyang/data/AR/label/category.txt")
     parser.add_argument("--src-videos-dir", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/videos")
+                        default="/ssd4/zhangyiyang/data/AR/videos/4-28")
 
     # to_frames_dir
     parser.add_argument("--to-frames-dir", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/frames")
-    parser.add_argument("--start-id", type=int, default=1)
+                        default="/ssd4/zhangyiyang/data/AR/raw_to_frames")
+    parser.add_argument("--start-id", type=int, default=4359)
     parser.add_argument("--img-prefix", type=str, default="{:05d}.jpg")
 
     # to_labels.txt
     parser.add_argument("--to-labels-file-path", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/total_samples.txt")
+                        default="/ssd4/zhangyiyang/data/AR/label/append-5-9.txt")
     parser.add_argument("--to-labels-file-append", action="store_true")
 
     return parser.parse_args()
@@ -55,7 +55,7 @@ def _handle_single_video(
         os.mkdir(cur_frames_dir)
 
     # ffmpeg 提取帧
-    if args.use_ffmpeg:
+    if args.ffmpeg:
         # {:06d}.jpg -> %06d.jpg
         fmt = args.img_prefix.replace("{", "") \
             .replace("}", "").replace(":", "%")
@@ -122,9 +122,11 @@ def main(args):
     category_to_id = {c: idx for idx, c in enumerate(categories)}
 
     tp_idx = 0
-    for category in os.listdir(args.src_videos_dir):
-        # 依次遍历每类视频
+    for category in categories:
         video_dir_path = os.path.join(args.src_videos_dir, category)
+        if not os.path.isdir(video_dir_path):
+            continue
+        # 依次遍历每类视频
         videos = os.listdir(video_dir_path)
         videos = [os.path.join(video_dir_path, v) for v in videos]
 
