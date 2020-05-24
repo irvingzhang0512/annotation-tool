@@ -25,7 +25,6 @@ def _parse_args():
     parser.add_argument("--web-frames-file-append", action="store_true")
 
     # from_frames_dir
-    parser.add_argument("--start-id", type=int, default=323)
     parser.add_argument("--img-prefix", type=str, default="{:05d}.jpg")
     parser.add_argument("--from-frames-dir", type=str,
                         default="/ssd4/zhangyiyang/tomcat9/webapps/annotation-tool/input/video")
@@ -111,6 +110,17 @@ def _handle_one_video(video_path,  # 视频文件路径（已存在）
         os.remove(tmp_video)
 
 
+def _get_start_id(cur_dir):
+    max_id = 0
+    for file_name in os.listdir(cur_dir):
+        try:
+            idx = int(file_name)
+            max_id = max(idx, max_id)
+        except:
+            pass
+    return max_id + 1
+
+
 def main(args):
     # 1. 获取目录下所有视频文件的绝对路径
     if not os.path.isdir(args.src_videos_dir):
@@ -132,9 +142,10 @@ def main(args):
         frame_file.write("URLID,Frame,Time\n")
 
     # 3. 遍历每个视频文件
+    start_id = _get_start_id(args.from_frames_dir)
     for idx, file_name in enumerate(file_names):
         # 每个视频文件对应一个输出文件夹，文件夹名称就是一个编号
-        cur_idx = idx + args.start_id
+        cur_idx = idx + start_id
         output_path = os.path.join(args.from_frames_dir, str(cur_idx))
         if not os.path.exists(output_path):
             os.makedirs(output_path)

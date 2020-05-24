@@ -9,7 +9,8 @@ def _parse_args():
 
     parser.add_argument("--ffmpeg", action="store_true", default=False)
     parser.add_argument("--fps", type=int, default=10)
-    parser.add_argument("--tmp-video", type=str, default="./test-categoried.avi")
+    parser.add_argument("--tmp-video", type=str,
+                        default="./test-categoried.avi")
 
     # input video path
     parser.add_argument("--category-file-path", type=str,
@@ -20,7 +21,6 @@ def _parse_args():
     # to_frames_dir
     parser.add_argument("--to-frames-dir", type=str,
                         default="/ssd4/zhangyiyang/data/AR/raw_to_frames")
-    parser.add_argument("--start-id", type=int, default=4359)
     parser.add_argument("--img-prefix", type=str, default="{:05d}.jpg")
 
     # to_labels.txt
@@ -109,6 +109,17 @@ def _handle_single_video(
         os.remove(args.tmp_video)
 
 
+def _get_start_id(cur_dir):
+    max_id = 0
+    for file_name in os.listdir(cur_dir):
+        try:
+            idx = int(file_name)
+            max_id = max(idx, max_id)
+        except:
+            pass
+    return max_id + 1
+
+
 def main(args):
     # 初始化TSM格式的标签文件
     if args.to_labels_file_append:
@@ -121,7 +132,8 @@ def main(args):
     categories = [c.replace("\n", "") for c in categories]
     category_to_id = {c: idx for idx, c in enumerate(categories)}
 
-    tp_idx = 0
+    # tp_idx = 0
+    cur_idx = _get_start_id(args.to_frames_dir)
     for category in categories:
         video_dir_path = os.path.join(args.src_videos_dir, category)
         if not os.path.isdir(video_dir_path):
@@ -133,11 +145,11 @@ def main(args):
         for video_path in videos:
             # 依次遍历每类视频中的每个视频文件
             _handle_single_video(video_path,
-                                 args.start_id + tp_idx,
+                                 cur_idx,
                                  to_file,
                                  category_to_id[category],
                                  args)
-            tp_idx += 1
+            cur_idx += 1
 
     to_file.close()
 

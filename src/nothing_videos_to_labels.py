@@ -19,7 +19,6 @@ def _parse_args():
     # to_frames_dir
     parser.add_argument("--to-frames-dir", type=str,
                         default="/ssd4/zhangyiyang/data/AR/raw_to_frames")
-    parser.add_argument("--start-id", type=int, default=735)
     parser.add_argument("--frames-per-sample", type=int, default=32)
     parser.add_argument("--img-prefix", type=str, default="{:05d}.jpg")
 
@@ -66,9 +65,20 @@ def _handle_one_video(video_path, to_labels_file, args):
         os.remove(args.tmp_video)
 
 
+def _get_start_id(cur_dir):
+    max_id = 0
+    for file_name in os.listdir(cur_dir):
+        try:
+            idx = int(file_name)
+            max_id = max(idx, max_id)
+        except:
+            pass
+    return max_id + 1
+
+
 def main(args):
     global cur_frames_cnt
-    cur_frames_cnt = args.start_id
+    cur_frames_cnt = _get_start_id(args.to_frames_dir)
     if not os.path.isdir(args.src_videos_dir):
         raise ValueError("unknown video dir {}".format(args.src_videos_dir))
 

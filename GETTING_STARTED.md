@@ -9,6 +9,8 @@
     + [1.4. 将标注结果转换为TSM模型可识别的形式](#14-将标注结果转换为tsm模型可识别的形式)
   + [2. 在原有数据集上添加数据](#2-在原有数据集上添加数据)
     + [2.1. 添加结构化视频文件夹](#21-添加结构化视频文件夹)
+    + [2.2. 添加nothing数据](#22-添加nothing数据)
+    + [2.3. 添加自己标注的数据](#23-添加自己标注的数据)
 
 ## 0. 前言
 + 目标：包括拍摄摄视频、标注动作、将标注结果转换为TSM可用的形式。
@@ -87,13 +89,12 @@
   + `--to-labels-file-path`
   + `--to-labels-file-append`：是追加文件，还是覆盖文件。
   + `--to-frames-dir`
-  + `--start-id`：`to_frames_dir` 中子文件夹的起始编号。
   + `--img-prefix`：帧文件名格式。
 + 具体功能：
   + 基本功能：
     + 读取所有类别名称，如果 `src_videos_dir` 中有与类别名称相同的子文件夹，则遍历子文件夹中的所有视频。
     + 将每个视频提取帧，提取到的帧保存到对应的frames文件夹中。
-    + 每个视频对应一个frames文件夹，文件夹通过 `to_frames_dir` 和 `--start-id` 以及当前视频在所有视频中的编号来确定。
+    + 每个视频对应一个frames文件夹，文件夹通过 `to_frames_dir` 和 以及当前视频在所有视频中的编号来确定。
     + 提取帧的过程中分别生成 `--to-labels-file-path` ，作为TSM的输入。
   + 提供了两种提取帧的方法。
     + 方法一：使用ffmpeg提取帧。
@@ -130,13 +131,12 @@
   + `--web-frames-file-path`
   + `--web-frames-file-append`
   + `--from-frames-dir`
-  + `--start-id`：`from_frames_dir` 中子文件夹的起始编号。
   + `--img-prefix`：帧文件名格式。
 + 具体功能：
   + 基本功能：
     + 读取 `src_videos_dir` 中的每个视频。
     + 将每个视频提取帧，提取到的帧保存到对应的frames文件夹中。
-    + 每个视频对应一个frames文件夹，文件夹通过 `from_frames_dir` 和 `--start-id` 以及当前视频在所有视频中的编号来确定。
+    + 每个视频对应一个frames文件夹，文件夹通过 `from_frames_dir` 和 以及当前视频在所有视频中的编号来确定。
     + 提取帧的过程中分别生成 `--web-videos-file-path` 以及 `--web-frames-file-path` 两个文件，用于网页标注。
   + 提供了两种提取帧的方法。
     + 方法一：使用ffmpeg提取帧。
@@ -171,7 +171,6 @@
   + `--to-frames-dir`
   + `--to-img-prefix`：帧文件名格式。
   + `--to-time-interval`
-  + `--start-id`：`to_frames_dir` 中子文件夹的起始编号。
 
 
 ## 2. 在原有数据集上添加数据

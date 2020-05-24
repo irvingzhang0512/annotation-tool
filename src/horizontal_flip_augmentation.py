@@ -19,7 +19,6 @@ def _parse_args():
 
     parser.add_argument("--to-flip-frames-dir", type=str,
                         default="/ssd4/zhangyiyang/data/AR/flip_frames")
-    parser.add_argument("--start-id", type=int, default=115048)
     parser.add_argument("--pre-to-labels-file-path", type=str,
                         default="/ssd4/zhangyiyang/data/AR/label/append-generate-5-9.txt")
     parser.add_argument("--after-to-labels-file-path", type=str,
@@ -28,6 +27,17 @@ def _parse_args():
                         default=False)
 
     return parser.parse_args()
+
+
+def _get_start_id(cur_dir):
+    max_id = 0
+    for file_name in os.listdir(cur_dir):
+        try:
+            idx = int(file_name)
+            max_id = max(idx, max_id)
+        except:
+            pass
+    return max_id + 1
 
 
 def main(args):
@@ -41,7 +51,8 @@ def main(args):
         after_to_labels_file = open(args.after_to_labels_file_path, "a")
     else:
         after_to_labels_file = open(args.after_to_labels_file_path, "w")
-    flip_frames_idx = args.start_id
+    flip_frames_idx = _get_start_id(args.to_flip_frames_dir)
+
     for pre_sample in tqdm(pre_samples):
         splits = pre_sample.split(" ")
         if len(splits) != 3:

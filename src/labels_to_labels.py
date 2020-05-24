@@ -25,7 +25,6 @@ def _parse_args():
                         default="/ssd4/zhangyiyang/data/AR/raw_to_frames")
     parser.add_argument("--to-img-prefix", type=str, default="{:05d}.jpg")
     parser.add_argument("--to-time-interval", type=float, default=.1)
-    parser.add_argument("--start-id", type=int, default=946)
 
     # to labels
     parser.add_argument("--to-labels-file-path", type=str,
@@ -102,11 +101,22 @@ def _handle_one_file(file_name, to_file, category_to_id, args):
                       " " + str(label_id) + "\n")
 
 
+def _get_start_id(cur_dir):
+    max_id = 0
+    for file_name in os.listdir(cur_dir):
+        try:
+            idx = int(file_name)
+            max_id = max(idx, max_id)
+        except:
+            pass
+    return max_id + 1
+
+
 def main(args):
     assert args.from_time_interval <= args.to_time_interval
 
     global to_id
-    to_id = args.start_id
+    to_id = _get_start_id(args.to_frames_dir)
 
     # 1. 读取输入标记结果路径
     file_names = os.listdir(args.from_labels_file_dir)
