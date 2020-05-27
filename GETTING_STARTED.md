@@ -55,10 +55,10 @@
   + 如果每个视频只有一个动作，那就在 `src_videos_dir` 中建立若干子文件夹，每个文件夹代表一种行为，通过子文件夹将行为分类。
     + 这种形式的文件夹取名为**结构化的视频文件夹**。
     + 通过 `src/categoried_videos.py` 就可以实现所有功能，不需要进行下面的步骤。
-    + 具体内容请查看 [2. 结构化视频文件夹处理](#2-结构化视频文件夹处理)。
+    + 具体内容请查看 [1.2. 结构化视频文件夹处理](#12-结构化视频文件夹处理)。
   + 如果每个视频有多个动作，则需要需要进行下面步骤。
 + 第二步：视频转换为帧。
-  + 具体请看 [3. 视频提取帧](#3-视频提取帧)。
+  + 具体请看 [1.3. 视频提取帧](#13-视频提取帧)。
   + 脚本：`src/video_to_frames.py`。
   + 输入：`src_videos_dir`。
   + 输出：`from_frames_dir`，`vidoes.txt`，`frames.txt`。
@@ -67,7 +67,7 @@
   + 标注完成后下载得到 `from_label.txt`。
 + 第四步：将标注结果转换为TSM模型可识别的形式。
   + 具体请查看 [4. 将标注结果转换为TSM模型可识别的形式](#4-将标注结果转换为tsm模型可识别的形式)
-  + 脚本：`src/labels_to_labels.py`。
+  + 脚本：`src/annotated_labels_to_labels.py`。
   + 输入：`from_frames_dir`, `from_label.txt`。
   + 输出：`to_frames_dir`，`to_label.txt`。
 
@@ -81,11 +81,13 @@
     + 类别文件（样例`sample/category.txt`），一行代表一种行为的名称，从0开始编号。
   + 输出：TSM标签 `to_label.txt` 以及对应新建的帧文件夹与帧图片。
 + 参数：
-  + `--src-videos-path`
+  + `--categoried-base-path`
+  + `--video-dir-name`
   + `--category-file-path`
   + `--ffmpeg`
   + `--fps`
   + `--tmp-video`
+  + `--to-frames-dir-name`
   + `--to-labels-file-path`
   + `--to-labels-file-append`：是追加文件，还是覆盖文件。
   + `--to-frames-dir`

@@ -12,14 +12,14 @@ def _parse_args():
 
     parser.add_argument("--num-classes", type=int, default=6)
     parser.add_argument("--to-labels-file-path", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/label/flip_total.txt")
+                        default="/ssd4/zhangyiyang/data/AR/label/0527_no_generate.txt")
     parser.add_argument("--val-percent-per-category", type=float, default=0.1)
-    parser.add_argument("--max-val-per-category", type=int, default=200)
+    parser.add_argument("--max-val-per-category", type=int, default=50)
 
     parser.add_argument("--train-file-path", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/label/train_samples.txt")
+                        default="/ssd4/zhangyiyang/data/AR/label/0527_train_samples.txt")
     parser.add_argument("--val-file-path", type=str,
-                        default="/ssd4/zhangyiyang/data/AR/label/val_samples.txt")
+                        default="/ssd4/zhangyiyang/data/AR/label/0527_val_samples.txt")
 
     return parser.parse_args()
 
